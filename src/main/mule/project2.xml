@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="eb98f86f-3e5c-46a1-aca5-e7f125586d7c" file="test.yaml" key="${token}" />
+	<global-property doc:name="Global Property" doc:id="046555fd-b4d1-44b5-b06a-a5a86045249e" name="token" value="1234567812345678" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="72428f5c-7120-47bc-b7dd-4217a4649e7f" basePath="/" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="project2Flow" doc:id="a0f40029-a279-401f-9530-c5fecab743b9" >
+		<http:listener doc:name="Listener" doc:id="2342f8d8-289d-4b97-b9c3-ed7789f6f498" path="/path2" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="ffa49426-656c-4d0a-ba5d-83130206c4f0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import p from Mule
+
+output application/json
+---
+{
+	"decrypted_user_name_value": p('secure::url.password')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9b19e3f8-f2cc-4326-a27a-38df842c0179" />
+	</flow>
+</mule>
